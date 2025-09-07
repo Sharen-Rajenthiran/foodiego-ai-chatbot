@@ -3,18 +3,26 @@ from typing import List, Optional
 from openai import AzureOpenAI
 from app.config import settings
 from app.models import ChatMessage
+from app.logging_config import logger
 
 
 class AzureOpenAIService:
     """Service for interacting with Azure OpenAI."""
     
     def __init__(self):
+        logger.info("Initializing Azure OpenAI service")
+        logger.info(f"Using deployment: {settings.deployment_name}")
+        logger.info(f"Using API version: {settings.api_version}")
+        
         self.client = AzureOpenAI(
-            api_key=settings.openai_api_key,
-            api_version=settings.openai_api_version,
-            azure_endpoint=settings.openai_endpoint
+            api_key=settings.api_key,
+            api_version=settings.api_version,
+            azure_endpoint=settings.azure_endpoint
         )
-        self.deployment_name = settings.azure_openai_deployment_name
+        
+        self.deployment_name = settings.deployment_name
+        
+        logger.info("Azure OpenAI service initialized successfully")
         
         # System prompt for the food chatbot
         self.system_prompt = """You are a helpful AI assistant for FoodieGo, a food delivery and restaurant discovery platform. 
@@ -52,12 +60,15 @@ class AzureOpenAIService:
         Returns:
             The AI assistant's response
         """
+        logger.info(f"Generating chat response for message: {user_message[:50]}...")
+        
         try:
             # Prepare messages for the API
             messages = [{"role": "system", "content": self.system_prompt}]
             
             # Add conversation history if provided
             if conversation_history:
+                logger.info(f"Adding {len(conversation_history)} messages from conversation history")
                 for msg in conversation_history:
                     messages.append({
                         "role": msg.role,
@@ -66,6 +77,8 @@ class AzureOpenAIService:
             
             # Add the current user message
             messages.append({"role": "user", "content": user_message})
+            
+            logger.info(f"Sending request to Azure OpenAI with {len(messages)} total messages")
             
             # Call Azure OpenAI
             response = self.client.chat.completions.create(
@@ -76,7 +89,11 @@ class AzureOpenAIService:
                 top_p=0.9
             )
             
-            return response.choices[0].message.content.strip()
+            response_content = response.choices[0].message.content.strip()
+            logger.info(f"Successfully received response from Azure OpenAI: {response_content[:100]}...")
+            
+            return response_content
             
         except Exception as e:
+            logger.error(f"Error in Azure OpenAI service: {str(e)}", exc_info=True)
             return f"I apologize, but I'm experiencing technical difficulties. Please try again later. Error: {str(e)}"

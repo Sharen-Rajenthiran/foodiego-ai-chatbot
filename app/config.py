@@ -7,15 +7,16 @@ class Settings(BaseSettings):
     """Application configuration settings."""
     
     # Azure OpenAI Configuration - support multiple naming conventions
-    azure_openai_api_key: Optional[str] = None
-    azure_openai_endpoint: Optional[str] = None
-    azure_openai_api_version: str = "2024-02-15-preview"
-    azure_openai_deployment_name: str = "gpt-4"
+    # azure_openai_api_key: Optional[str] = os.environ.get("API_KEY")
+    # azure_openai_endpoint: Optional[str] = os.environ.get("AZURE_ENDPOINT")
+    # azure_openai_api_version: str = os.environ.get("API_VERSION")
+    # azure_openai_deployment_name: str = os.environ.get("DEPLOYMENT_NAME")
     
     # Alternative naming for existing environment variables
-    api_key: Optional[str] = None
-    azure_endpoint: Optional[str] = None
-    api_version: Optional[str] = None
+    api_key: Optional[str] = os.environ.get("API_KEY")
+    azure_endpoint: Optional[str] = os.environ.get("AZURE_ENDPOINT")
+    api_version: Optional[str] = os.environ.get("API_VERSION")
+    deployment_name: Optional[str] = os.environ.get("DEPLOYMENT_NAME")
     
     # Server Configuration
     host: str = "localhost"
@@ -33,17 +34,22 @@ class Settings(BaseSettings):
     @property
     def openai_api_key(self) -> str:
         """Get the OpenAI API key from either naming convention."""
-        return self.azure_openai_api_key or self.api_key or ""
+        return self.api_key
     
     @property
     def openai_endpoint(self) -> str:
         """Get the OpenAI endpoint from either naming convention."""
-        return self.azure_openai_endpoint or self.azure_endpoint or ""
+        return self.azure_endpoint
     
     @property
     def openai_api_version(self) -> str:
         """Get the OpenAI API version from either naming convention."""
-        return self.azure_openai_api_version or self.api_version or "2024-02-15-preview"
+        return self.api_version
+
+    @property
+    def openai_deployment_name(self) -> str:
+        """Get the OpenAI deployment name from either naming convention."""
+        return self.deployment_name
     
     def validate_azure_openai_config(self) -> bool:
         """Validate that Azure OpenAI configuration is complete."""
