@@ -1,0 +1,174 @@
+# FoodieGo AI Chatbot Backend
+
+A FastAPI-based backend service for an AI-powered chatbot that helps customers discover restaurants, cities, and menu items available on the FoodieGo platform.
+
+## Features
+
+- **AI-Powered Chat**: Uses Azure OpenAI to provide intelligent responses about restaurants and food
+- **RESTful API**: Clean FastAPI-based API with automatic documentation
+- **CORS Support**: Configured for Next.js frontend integration
+- **Health Monitoring**: Built-in health check endpoints
+- **Structured Responses**: Well-defined request/response models
+
+## Project Structure
+
+```
+ai-chatbot/
+├── app/
+│   ├── __init__.py
+│   ├── main.py              # FastAPI application entry point
+│   ├── config.py            # Configuration settings
+│   ├── models.py            # Pydantic models
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── chat.py          # Chat API endpoints
+│   └── services/
+│       ├── __init__.py
+│       └── azure_openai_service.py  # Azure OpenAI integration
+├── context.py               # Restaurant and city data
+├── requirements.txt         # Python dependencies
+├── .env.example            # Environment variables template
+├── run.py                  # Server startup script
+└── README.md               # This file
+```
+
+## Setup
+
+### 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Configure Environment Variables
+
+Copy the example environment file and fill in your Azure OpenAI credentials:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your Azure OpenAI configuration:
+
+```env
+AZURE_OPENAI_API_KEY=your_azure_openai_api_key_here
+AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-02-15-preview
+AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4
+```
+
+### 3. Run the Server
+
+```bash
+python run.py
+```
+
+The server will start on `http://localhost:8001`
+
+## API Endpoints
+
+### Chat Endpoint
+
+**POST** `/api/v1/chat`
+
+Send a message to the AI chatbot.
+
+**Request Body:**
+```json
+{
+  "message": "What restaurants are available in New York?",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "Hello"
+    },
+    {
+      "role": "assistant", 
+      "content": "Hi! How can I help you find great food today?"
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "response": "In New York, we have several great restaurants available including The Golden Plate, Saffron Kitchen, Blue Moon Bistro, and more...",
+  "conversation_id": null
+}
+```
+
+### Health Check
+
+**GET** `/health`
+
+Check if the service is running.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "message": "Service is running"
+}
+```
+
+## API Documentation
+
+Once the server is running, you can access:
+
+- **Swagger UI**: `http://localhost:8001/docs`
+- **ReDoc**: `http://localhost:8001/redoc`
+
+## Available Data
+
+The chatbot has access to information about:
+
+- **Cities**: New York, San Francisco, Chicago, Austin, Seattle, Boston, Denver, Los Angeles, Portland, Miami
+- **Restaurants**: The Golden Plate, Saffron Kitchen, Blue Moon Bistro, Rustic Table, Spice Garden, Coastal Catch, Urban Farmhouse, Mountain View Grill, Sunset Terrace, Heritage Kitchen
+- **Cuisines**: Italian, Japanese, Mexican, Chinese, American, French, Thai, Indian, Korean, Spanish
+- **Menu Items**: Burgers, Pasta, Pizza, Sushi, Ice cream
+
+## Development
+
+### Running in Development Mode
+
+```bash
+python run.py
+```
+
+The server will automatically reload when you make changes to the code.
+
+### Testing the API
+
+You can test the API using curl:
+
+```bash
+curl -X POST "http://localhost:8001/api/v1/chat" \
+     -H "Content-Type: application/json" \
+     -d '{"message": "What restaurants do you have?"}'
+```
+
+## Configuration
+
+The application can be configured through environment variables:
+
+- `AZURE_OPENAI_API_KEY`: Your Azure OpenAI API key
+- `AZURE_OPENAI_ENDPOINT`: Your Azure OpenAI endpoint URL
+- `AZURE_OPENAI_API_VERSION`: API version (default: 2024-02-15-preview)
+- `AZURE_OPENAI_DEPLOYMENT_NAME`: Deployment name (default: gpt-4)
+- `HOST`: Server host (default: 0.0.0.0)
+- `PORT`: Server port (default: 8001)
+- `DEBUG`: Enable debug mode (default: false)
+- `ALLOWED_ORIGINS`: CORS allowed origins (comma-separated)
+
+## Next.js Integration
+
+This backend is designed to work with a Next.js frontend. Make sure to:
+
+1. Configure CORS origins in the `.env` file to include your Next.js development server
+2. Use the chat endpoint at `http://localhost:8001/api/v1/chat`
+3. Handle the JSON response format in your frontend
+
+## License
+
+This project is part of the FoodieGo platform.
