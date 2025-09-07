@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.api.chat import router as chat_router
+from app.logging_config import logger
 
 # Create FastAPI application
 app = FastAPI(
@@ -11,6 +12,8 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+logger.info("Starting FoodieGo AI Chatbot API")
 
 # Add CORS middleware
 app.add_middleware(
@@ -28,6 +31,7 @@ app.include_router(chat_router, prefix="/api/v1", tags=["chat"])
 @app.get("/")
 async def root():
     """Root endpoint."""
+    logger.info("Root endpoint accessed")
     return {
         "message": "Welcome to FoodieGo AI Chatbot API",
         "version": "1.0.0",
@@ -38,6 +42,7 @@ async def root():
 @app.get("/health")
 async def health():
     """Health check endpoint."""
+    logger.info("Health check endpoint accessed")
     return {"status": "healthy", "message": "Service is running"}
 
 
